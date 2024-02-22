@@ -20,9 +20,12 @@ import pytest
 
 @dataclass
 class MockArgs:
-    fix_h: int | None = None
-    fix_w: int | None = None
-    match_y: bool = False
+    autolayout_percent_x: int | None = None
+    autolayout_percent_y: int | None = None
+    autolayout_prefer_h: int | None = None
+    # fix_h: int | None = None
+    # fix_w: int | None = None
+    # match_y: bool = False
 
 
 @pytest.mark.parametrize(
@@ -229,4 +232,53 @@ def test_fix_dashboard(fix, dash, exp_dash):
         assert exp_dash != orig_dash
     else:
         exp_dash = orig_dash
+    assert dash == exp_dash
+
+
+def test_fix_dashboard_autolayout():
+    args = MockArgs(
+        autolayout_percent_x=20, autolayout_percent_y=50, autolayout_prefer_h=6
+    )
+    dash = {
+        "panels": [
+            {"type": "x", "gridPos": {"x": 0, "y": 0, "w": 13, "h": 5}},
+            # w:18 is too much to be adjusted so w stays
+            {"type": "x", "gridPos": {"x": 0, "y": 5, "w": 18, "h": 6}},
+            # h:22 is too much to change either
+            {"type": "x", "gridPos": {"x": 0, "y": 11, "w": 23, "h": 22}},
+        ]
+    }
+    fix_dashboard(args, dash)
+    exp_dash = {
+        "graphTooltip": 1,
+        "panels": [
+            {
+                "gridPos": {
+                    "h": 6,
+                    "w": 12,
+                    "x": 0,
+                    "y": 0,
+                },
+                "type": "x",
+            },
+            {
+                "gridPos": {
+                    "h": 6,
+                    "w": 18,
+                    "x": 0,
+                    "y": 6,
+                },
+                "type": "x",
+            },
+            {
+                "gridPos": {
+                    "h": 22,
+                    "w": 24,
+                    "x": 0,
+                    "y": 12,
+                },
+                "type": "x",
+            },
+        ],
+    }
     assert dash == exp_dash

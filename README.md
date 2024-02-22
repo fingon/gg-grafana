@@ -79,10 +79,22 @@ up with more use-cases.
 
 - with command-line options, it can do more (e.g. fix layout issues)
 
-  - rewrite one or all rows to have components with fixed width
+    - best-guess layout fixes
 
-  - rewrite one or all rows to have components with fixed height
+        - ensure that heights of components are ~consistent (automatically fix
+          off-by-X errors)
 
+        - ensure that widths of components are ~consistent (automatically fix off-by-X errors)
+
+## TODO
+
+- collapsed panels are ignored for now in autolayout code
+
+- some command line options are just commented out for now:
+
+    - rewrite one or all rows to have components with fixed height
+
+    - rewrite one or all rows to have components with fixed width
 
 ## How do you use this tool again?
 
