@@ -12,9 +12,10 @@
 
 """
 
-from gggrafana import fix_dashboard
+from gggrafana import fix_dashboard, rewrite_dashboard
 from dataclasses import dataclass
 import copy
+import json
 import pytest
 
 
@@ -23,6 +24,7 @@ class MockArgs:
     autolayout_percent_x: int | None = None
     autolayout_percent_y: int | None = None
     autolayout_prefer_h: int | None = None
+    indent: bool = False
     # fix_h: int | None = None
     # fix_w: int | None = None
     # match_y: bool = False
@@ -282,3 +284,26 @@ def test_fix_dashboard_autolayout():
         ],
     }
     assert dash == exp_dash
+
+
+def test_rewrite_dashboard(tmp_path):
+    args = MockArgs()
+    blank = tmp_path / "blank.json"
+    blank.write_text("{}")
+    assert rewrite_dashboard(args, blank)
+    # Second rewrite is nop
+    assert not rewrite_dashboard(args, blank)
+    assert json.loads(blank.read_text()) == {"graphTooltip": 1}
+
+    # Default but with funky spacing compared to what Python wants
+    default = tmp_path / "default.json"
+    default.write_text('{"graphTooltip" : 1}')
+    assert rewrite_dashboard(args, default)
+
+    # Blank but with funky spacing
+    blank2 = tmp_path / "blank2.json"
+    blank2.write_text("{ }")
+    indent_args = MockArgs(indent=True)
+    assert rewrite_dashboard(indent_args, blank2)
+    assert not rewrite_dashboard(indent_args, blank2)
+    assert json.loads(blank2.read_text()) == {}

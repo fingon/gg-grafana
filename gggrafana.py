@@ -14,8 +14,8 @@ Grafana JSON dashboard sanitizer tool
 
 import json
 import copy
-import os
 from collections import Counter
+from pathlib import Path
 
 
 def fix_timeseries_hover(panel):
@@ -211,19 +211,22 @@ def fix_dashboard(args, dash):
             break
 
 
-def handle_dashboard(args, dashboard_path):
-    print("Handling", dashboard_path)
-    with open(dashboard_path) as f:
-        dash = json.load(f)
-    orig_dash = copy.deepcopy(dash)
-    fix_dashboard(args, dash)
-    if dash == orig_dash:
-        return
-    temp = f"{dashboard_path}.tmp"
-    with open(temp, "w") as g:
-        json.dump(dash, g, indent=2, sort_keys=True)
-    os.rename(temp, dashboard_path)
-    print("Rewrote", dashboard_path)
+def rewrite_dashboard(args, dashboard_filename):
+    print("Handling", dashboard_filename)
+    path = Path(dashboard_filename)
+    assert path.suffix == ".json"
+    original_text = path.read_text()
+    dash = json.loads(original_text)
+    if not args.indent:
+        fix_dashboard(args, dash)
+    text = json.dumps(dash, indent=2, sort_keys=True)
+    if original_text == text:
+        return False
+    temp = path.with_suffix(".json.tmp")
+    temp.write_text(text)
+    temp.rename(path)
+    print("Rewrote", dashboard_filename)
+    return True
 
 
 if __name__ == "__main__":
@@ -251,9 +254,14 @@ if __name__ == "__main__":
         help="Prefer this height (try coercing everything to this within the percent, and failing that, do normal percent-based autolayout for rest)",
         type=int,
     )
+    p.add_argument(
+        "--indent",
+        action="store_true",
+        help="Only indent the file (skip rewriting)",
+    )
     # p.add_argument("--match-y", help="Apply --fix only to specific --y")
     # p.add_argument("--fix-w", help="Fix width of matching/all panels", type=int)
     # p.add_argument("--fix-h", help="Fix height of matching/all panels", type=int)
     args = p.parse_args()
     for dashboard in args.dashboard:
-        handle_dashboard(args, dashboard)
+        rewrite_dashboard(args, dashboard)
