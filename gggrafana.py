@@ -48,6 +48,17 @@ def fix_timeseries_min(panel):
     default["min"] = 0
 
 
+def fix_timeseries_stacking_opacity(panel):
+    custom = panel.get("fieldConfig", {}).get("custom", {})
+    if custom.get("stacking", {}).get("mode", "none") == "none":
+        return
+    opacity = custom.get("fillOpacity", 0)
+    # If you have completely/mostly transparent stacked stuff, you're barbarian
+    # Tested as FIX5
+    if opacity < 20:
+        custom["fillOpacity"] = 50
+
+
 def fix_target(target):
     # Default of 'both' for instant+range is mostly problematic.
     #
@@ -68,6 +79,7 @@ def fix_panel(args, panel):
     if panel["type"] == "timeseries":
         fix_timeseries_hover(panel)
         fix_timeseries_min(panel)
+        fix_timeseries_stacking_opacity(panel)
         for target in panel.get("targets", []):
             fix_target(target)
 
@@ -219,7 +231,7 @@ def rewrite_dashboard(args, dashboard_filename):
     dash = json.loads(original_text)
     if not args.indent:
         fix_dashboard(args, dash)
-    text = json.dumps(dash, indent=2, sort_keys=True)
+    text = json.dumps(dash, indent=2, sort_keys=True) + "\n"
     if original_text == text:
         return False
     temp = path.with_suffix(".json.tmp")

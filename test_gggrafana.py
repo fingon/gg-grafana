@@ -224,6 +224,39 @@ class MockArgs:
                 ],
             },
         ),
+        # Make sure stacked things are non-opaque
+        (
+            "FIX5",
+            {
+                "graphTooltip": 1,
+                "panels": [
+                    {
+                        "fieldConfig": {"custom": {"stacking": {"mode": "normal"}}},
+                        "type": "timeseries",
+                    },
+                ],
+            },
+            {
+                "graphTooltip": 1,
+                "panels": [
+                    {
+                        "fieldConfig": {
+                            "custom": {
+                                "fillOpacity": 50,
+                                "stacking": {"mode": "normal"},
+                            }
+                        },
+                        "options": {
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc",
+                            },
+                        },
+                        "type": "timeseries",
+                    },
+                ],
+            },
+        ),
     ],
 )
 def test_fix_dashboard(fix, dash, exp_dash):

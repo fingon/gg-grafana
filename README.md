@@ -65,9 +65,6 @@ up with more use-cases.
 
 - by default, it adds some sane defaults
 
-  - single time series showing tooltip default is probably worst default in
-    Grafana; this changes that to multi+descending
-
   - non-shared cross-hair among panels is also similar; this changes it to
     the default shared one (without shared tooltip)
 
@@ -76,6 +73,12 @@ up with more use-cases.
 
   - Prometheus targets within panels that have both instant+range retain
     only range
+
+  - single time series showing tooltip default is probably worst default in
+    Grafana; this changes that to multi+descending
+
+  - stacked stuff that is transparent is hard to read; enforce minimum
+    opacity
 
 - with command-line options, it can do more (e.g. fix layout issues)
 
