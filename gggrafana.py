@@ -30,8 +30,12 @@ def fix_timeseries_hover(panel):
 
 
 def fix_timeseries_min(panel):
-    default = panel.get("fieldConfig", {}).get("defaults")
-    if default is None or "min" in default:
+    fc = panel.get("fieldConfig", {})
+    default = fc.get("defaults", {})
+    if "min" in default:
+        return
+    # Temperatures can be negative (TBD what else)
+    if default.get("unit") in {"celsius", "fahrenheit"}:
         return
     # (Lamely) see if defaulting to 0 is bad idea
     #

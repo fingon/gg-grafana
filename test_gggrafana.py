@@ -132,6 +132,28 @@ class MockArgs:
             },
         ),
         (
+            "FIX3-celsius",
+            {
+                "graphTooltip": 1,
+                "panels": [
+                    {
+                        "fieldConfig": {"defaults": {"unit": "celsius"}},
+                        "options": {
+                            "tooltip": {
+                                "mode": "multi",
+                                "sort": "desc",
+                            },
+                        },
+                        "targets": [
+                            {"datasource": {"type": "prometheus"}},
+                        ],
+                        "type": "timeseries",
+                    },
+                ],
+            },
+            None,
+        ),
+        (
             "FIX3-non-prometheus",
             {
                 "graphTooltip": 1,
